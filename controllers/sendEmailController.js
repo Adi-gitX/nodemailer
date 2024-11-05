@@ -1,34 +1,42 @@
-require('dotenv').config();
+// controllers/sendEmailController.js
 const nodemailer = require('nodemailer');
 
-const sendWelcomeEmail = async (userEmail, userName) => {
-  // Configure the SMTP settings
-  const config = {
+const sendEmailController = async (req, res) => {
+  const { to } = req.body;
+
+  // Customize the subject and HTML content for the welcome email
+  const subject = 'Welcome to Our Service!';
+  const html = `
+    <h1>Welcome!</h1>
+    <p>Dear User,</p>
+    <p>Thank you for joining us! We are thrilled to have you on board.</p>
+    <p>If you have any questions, feel free to reach out to us.</p>
+    <p>Best Regards,<br>Your Company Name</p>
+  `;
+
+  let config = {
     service: 'gmail',
     auth: {
-      user: process.env.GMAIL_ACCOUNT,
-      pass: process.env.APP_PASSWORD
+      user: '<gmail-account>',
+      pass: '<app-password>'
     }
   };
 
-  // Create a transporter object using the default SMTP transport
-  const transporter = nodemailer.createTransport(config);
+  let transporter = nodemailer.createTransport(config);
 
-  // Create the email message
-  const message = {
-    from: process.env.GMAIL_ACCOUNT,
-    to: userEmail,
-    subject: 'Welcome to Our Service!',
-    html: `<h1>Welcome, ${userName}!</h1><p>Thank you for joining us. We are excited to have you!</p>`
+  let message = {
+    from: '<gmail-account>',
+    to: to,
+    subject: subject,
+    html: html
   };
 
   try {
-    // Send the email
     await transporter.sendMail(message);
-    console.log('Welcome email sent successfully');
+    res.status(200).send('Welcome email sent successfully');
   } catch (error) {
-    console.error('Failed to send welcome email:', error.toString());
+    res.status(500).send(error.toString());
   }
 };
 
-module.exports = sendWelcomeEmail;
+module.exports = sendEmailController;
